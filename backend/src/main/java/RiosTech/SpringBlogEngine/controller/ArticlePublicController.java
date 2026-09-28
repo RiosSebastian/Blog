@@ -1,32 +1,38 @@
 package RiosTech.SpringBlogEngine.controller;
 
-import RiosTech.SpringBlogEngine.entity.Article;
-import RiosTech.SpringBlogEngine.repository.ArticleRepository;
-import RiosTech.SpringBlogEngine.util.Status;
+import RiosTech.SpringBlogEngine.dto.ArticleResponse;
+import RiosTech.SpringBlogEngine.dto.ArticleSummary;
+import RiosTech.SpringBlogEngine.mapper.ArticleMapper;
+import RiosTech.SpringBlogEngine.service.ArticleService;
+import RiosTech.SpringBlogEngine.util.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/articles")
 @RequiredArgsConstructor
 public class ArticlePublicController {
 
-    private final ArticleRepository repo;
+    private final ArticleService service;
+    private final ArticleMapper mapper;
 
     @GetMapping
-    public Page<Article> list(Pageable pageable) {
-        return repo.findByStatusAndDeletedFalse(Status.PUBLISHED, pageable);
+    public Page<ArticleSummary> list(
+            @RequestParam(defaultValue = "") String q,
+            @RequestParam(required = false) Category category,
+            Pageable pageable) {
+        return service.search(q, category, pageable).map(mapper::toSummary);
+    }
+
+    @GetMapping("/categories")
+    public Category[] categories() {
+        return Category.values();
     }
 
     @GetMapping("/{slug}")
-    public Article get(@PathVariable String slug) {
-        return repo.findBySlugAndStatus(slug, Status.PUBLISHED)
-                .orElseThrow();
+    public ArticleResponse get(@PathVariable String slug) {
+        return mapper.toDto(service.readPublic(slug));
     }
 }

@@ -1,5 +1,6 @@
 package RiosTech.SpringBlogEngine.entity;
 
+import RiosTech.SpringBlogEngine.util.Category;
 import RiosTech.SpringBlogEngine.util.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,11 +28,14 @@ public class Article {
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Category category;
 
-    private Long views;
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.DRAFT;
 
-    private LocalDateTime createdAt;
+    private Long views = 0L;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime publishedAt;
 
     private boolean deleted = false;
