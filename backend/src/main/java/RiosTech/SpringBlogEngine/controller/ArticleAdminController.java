@@ -25,7 +25,7 @@ public class ArticleAdminController {
     private final ArticleService service;
     private final ArticleMapper mapper;
     private final ImageService imageService;
-
+ 
     @GetMapping
     public Page<ArticleSummary> list(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
